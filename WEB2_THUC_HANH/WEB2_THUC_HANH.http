@@ -1,0 +1,6 @@
+@WEB2_THUC_HANH_HostAddress = http://localhost:5056
+
+GET {{WEB2_THUC_HANH_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
