@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using WebAPI_simple.Data;
+using WEB2_THUC_HANH.Repositories;
+using WEB2_THUC_HANH.Data;
+using WEB2_THUC_HANH.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +15,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 var app = builder.Build();
-
+builder.Services.AddScoped<IBookRepository, SQLBookRepository>();
+builder.Services.AddScoped<IPublisherRepository, SQLPublisherRepository>();
 
 
 

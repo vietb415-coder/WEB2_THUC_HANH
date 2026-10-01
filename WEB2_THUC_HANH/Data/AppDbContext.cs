@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Internal;
 using WEB2_THUC_HANH.Model.Domain;
 
-namespace WebAPI_simple.Data
+namespace WEB2_THUC_HANH.Data
 {
     public class AppDbContext : DbContext
     {
