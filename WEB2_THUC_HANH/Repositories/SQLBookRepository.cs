@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WEB2_THUC_HANH.Data;
 using WEB2_THUC_HANH.Model.Domain;
 using WEB2_THUC_HANH.Model.DTO;
 using WEB2_THUC_HANH.Repositories;
-using WEB2_THUC_HANH.Data;
 
 
 namespace WEB2_THUC_HANH.Repositories
@@ -15,7 +16,12 @@ namespace WEB2_THUC_HANH.Repositories
             _dbContext = dbContext;
         }
 
-        public List<BookWithAuthorAndPublisherDTO> GetAllBooks()
+        public List<BookWithAuthorAndPublisherDTO> GetAllBooks([FromQuery] string? filterOn,
+    [FromQuery] string? filterQuery,
+    [FromQuery] string? sortBy,
+    [FromQuery] bool isAscending,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 100  )
         {
             var allBooks = _dbContext.Books.Select(Books => new BookWithAuthorAndPublisherDTO()
             {
@@ -29,8 +35,37 @@ namespace WEB2_THUC_HANH.Repositories
                 CoverUrl = Books.CoverUrl,
                 PublisherName = Books.Publisher.Name,
                 AuthorNames = Books.Book_Authors.Select(n => n.Author.FullName).ToList()
-            }).ToList();
-            return allBooks;
+            }).AsQueryable();
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false &&
+     string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("title", StringComparison.OrdinalIgnoreCase))
+                {
+                    allBooks = allBooks.Where(x =>
+                        x.Title.Contains(filterQuery));
+                }
+            }
+
+            //sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("title", StringComparison.OrdinalIgnoreCase))
+                {
+                    allBooks = isAscending
+                        ? allBooks.OrderBy(x => x.Title)
+                        : allBooks.OrderByDescending(x => x.Title);
+                }
+            }
+
+            //pagination
+            var skipResults = (pageNumber - 1) * pageSize;
+
+            return allBooks
+                .Skip(skipResults)
+                .Take(pageSize)
+                .ToList();
+
         }
         public BookWithAuthorAndPublisherDTO GetBookById(int id)
         {
